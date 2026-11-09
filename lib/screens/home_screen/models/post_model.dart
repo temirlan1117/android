@@ -1,24 +1,27 @@
+import 'comment_model.dart';
+
 class PostModel {
   final String? imageUrl;
+  final String? imageAsset;
   int? likeCount;
-  int? commentCount;
+  final List<CommentModel> comments;
+  int get commentCount => comments.length;
   final String? description;
 
   PostModel({
     this.imageUrl,
+    this.imageAsset,
     this.likeCount,
-    this.commentCount,
+    List<CommentModel>? comments,
     this.description,
-  });
+  }) : comments = comments ?? [];
 
   void addLike(int newCount) {
     // This method should ideally update the like count in a state management solution
     likeCount = newCount;
   }
 
-  void addComment(int newCount) {
-    // This method should ideally update the comment count in a state management solution
-    commentCount = newCount;
+  void addComment(CommentModel comment) {
+    comments.add(comment);
   }
-
 }

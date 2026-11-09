@@ -1,31 +1,31 @@
 import "package:android_dev/screens/home_screen/models/post_model.dart";
 import "package:flutter/material.dart";
 
+import 'comments_sheet.dart';
+
 class PostWidget extends StatefulWidget {
   final PostModel? post;
-  const PostWidget({super.key,required this.post});
+  const PostWidget({super.key, required this.post});
 
   @override
   State<PostWidget> createState() => _PostWidgetState();
 }
 
 class _PostWidgetState extends State<PostWidget> {
-  final bool isLiked = false; 
- // This should ideally be managed by state management
+  final bool isLiked = false;
+  // This should ideally be managed by state management
 
- void openBottomSheet() {
-    showModalBottomSheet(
+  Future<void> openBottomSheet() async {
+    final post = widget.post;
+    if (post == null) return;
+    await showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       builder: (BuildContext context) {
-        return Container(
-          height: 200,
-          color: Colors.white,
-          child: Center(
-            child: Text('Bottom Sheet Content'),
-          ),
-        );
+        return CommentsSheet(post: post);
       },
     );
+    if (mounted) setState(() {});
   }
 
   @override
@@ -48,11 +48,17 @@ class _PostWidgetState extends State<PostWidget> {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(8.0),
-            child: Image.network(
-              widget.post?.imageUrl ?? 'https://via.placeholder.com/150',
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
+            child: widget.post?.imageAsset != null
+                ? Image.asset(
+                    widget.post!.imageAsset!,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  )
+                : Image.network(
+                    widget.post?.imageUrl ?? 'https://via.placeholder.com/150',
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
           ),
           Row(
             children: [
@@ -75,10 +81,7 @@ class _PostWidgetState extends State<PostWidget> {
                   openBottomSheet();
                 },
               ),
-              IconButton(
-                icon: const Icon(Icons.share),
-                onPressed: () {},
-              ),
+              IconButton(icon: const Icon(Icons.share), onPressed: () {}),
               Spacer(),
               IconButton(
                 icon: const Icon(Icons.bookmark_border),
@@ -86,13 +89,13 @@ class _PostWidgetState extends State<PostWidget> {
               ),
             ],
           ),
+          Text('Комментарии: ${widget.post?.commentCount ?? 0}'),
           Text(
             widget.post?.description ?? '',
             style: const TextStyle(fontSize: 16.0),
           ),
-
-        ],)
-
+        ],
+      ),
     );
   }
 }
